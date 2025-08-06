@@ -1,6 +1,6 @@
 
-import Dashboard from '@/components/dashboard';
+import DuplicatesDashboard from '@/components/duplicates-dashboard';
 
 export default function Home() {
-  return <Dashboard />;
+  return <DuplicatesDashboard />;
 }

@@ -1,21 +1,14 @@
 
-import DuplicatesDashboard from '@/components/duplicates-dashboard';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-
+'use client';
+// This page is intentionally left blank for now. 
+// The primary duplicate finding functionality is on the main dashboard.
 export default function DuplicatesPage() {
   return (
     <div className="space-y-6 py-6">
-       <Card>
-            <CardHeader>
-                <CardTitle>Duplicates Finder</CardTitle>
-                <CardDescription>
-                    Start a new scan to find and remove duplicate files, reclaiming valuable disk space.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <DuplicatesDashboard />
-            </CardContent>
-        </Card>
+       <h1 className="text-3xl font-bold">Duplicates</h1>
+      <p className="text-muted-foreground">
+        The core duplicate scanning functionality is currently on the main dashboard.
+      </p>
     </div>
   );
 }

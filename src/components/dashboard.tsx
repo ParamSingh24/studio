@@ -1,11 +1,13 @@
+
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
-import { Copy, HardDrive, AlertTriangle, CheckCircle, TrendingUp, FolderGit2, Percent } from 'lucide-react';
+import { Copy, HardDrive, AlertTriangle, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
+import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, Pie, PieChart, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import DuplicatesDashboard from './duplicates-dashboard';
 
 const storageSavingsData = [
   { month: 'Jan', saved: 2.1 },
@@ -155,18 +157,13 @@ export default function Dashboard() {
 
         <Card>
             <CardHeader>
-                <CardTitle>Ready to Clean Up?</CardTitle>
+                <CardTitle>Duplicates Finder</CardTitle>
                 <CardDescription>
-                    Navigate to the Duplicates page to find and remove duplicate files, reclaiming valuable disk space.
+                    Start a new scan to find and remove duplicate files, reclaiming valuable disk space.
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                 <Link href="/duplicates" passHref>
-                    <Button>
-                        <Copy className="mr-2" />
-                        Go to Duplicates Finder
-                    </Button>
-                </Link>
+                <DuplicatesDashboard />
             </CardContent>
         </Card>
     </div>
