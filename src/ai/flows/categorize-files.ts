@@ -16,7 +16,7 @@ const CategorizeFilesInputSchema = z.array(
     fileName: z.string().describe('The name of the file.'),
     fileType: z.string().describe('The type of the file (e.g., application/pdf, image/jpeg, etc.).'),
     fileSize: z.number().describe('The size of the file in bytes.'),
-    fileHash: z.string().describe('The SHA-256 hash of the file content.'),
+    filePath: z.string().describe('The full path of the file.'),
   })
 ).describe('An array of file metadata objects to categorize.');
 
@@ -41,16 +41,15 @@ const prompt = ai.definePrompt({
   name: 'categorizeFilesPrompt',
   input: {schema: CategorizeFilesInputSchema},
   output: {schema: CategorizeFilesOutputSchema},
-  prompt: `You are an expert file categorization AI.
+  prompt: `You are an expert file categorization AI. Your task is to analyze file metadata and categorize each file into one of the following categories: Games, Productivity, Development, Browsers, Media, Graphics, Security, System Tools, or Other.
 
-  Given a list of files with their metadata (name, type, size, hash), you will predict the most appropriate category for each file from the following list:
-  Games, Productivity, Development, Browsers, Media, Graphics, Security, System Tools, Other.
+  Consider the file name, type, size, and especially its path to make an accurate prediction. For example, a file in a 'Steam' directory is likely a game.
 
-  Return a JSON array of file categorization results, including the file name, predicted category, a confidence score (0-1), and a brief reasoning for the categorization.
+  Return a JSON array of objects. Each object must contain the original file name, its predicted category, a confidence score between 0 and 1, and a brief reasoning for your choice.
 
   Here is the list of files to categorize:
   {{#each this}}
-  - Filename: {{{fileName}}}, File Type: {{{fileType}}}, File Size: {{{fileSize}}} bytes
+  - Filename: {{{fileName}}}, Path: {{{filePath}}}, File Type: {{{fileType}}}, File Size: {{{fileSize}}} bytes
   {{/each}}
   `,
 });

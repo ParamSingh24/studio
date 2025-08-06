@@ -16,6 +16,8 @@ const FileInfoSchema = z.object({
   path: z.string().describe('The installation path of the file.'),
   size: z.number().describe('The size of the file in bytes.'),
   lastModified: z.string().describe('The last modification date in ISO 8601 format.'),
+  lastAccessed: z.string().describe('The last access date in ISO 8601 format.'),
+  version: z.string().optional().describe('The file version, if available.'),
 });
 
 const RecommendCleanupInputSchema = z.object({
@@ -40,13 +42,17 @@ const prompt = ai.definePrompt({
   output: {schema: RecommendCleanupOutputSchema},
   prompt: `You are an AI assistant that recommends which of several duplicate files a user should keep.
 
-  Analyze the file metadata provided. Your recommendation should be based on factors like which file is the most recent (lastModified), which one is in a more "official" or "standard" location (e.g., 'Program Files' vs. 'Downloads'), or which is larger if they differ slightly (suggesting a more complete version).
+  Analyze the provided file metadata. Your recommendation should be based on a hierarchy of factors:
+  1.  **Version:** A higher version number is almost always better.
+  2.  **Path:** "Official" locations (e.g., 'Program Files', '/usr/bin') are preferable to temporary or download folders.
+  3.  **Recency:** A more recent 'lastModified' or 'lastAccessed' date is generally better.
+  4.  **Size:** A larger file might indicate a more complete version, but this is a weak indicator.
 
-  Provide a concise recommendation explaining your reasoning, a confidence score, and explicitly state which file should be kept.
+  Provide a concise recommendation explaining your reasoning, a confidence score based on the strength of the signals, and explicitly state which file should be kept.
 
   Files to analyze:
   {{#each files}}
-  - Name: {{{name}}}, Path: {{{path}}}, Size: {{{size}}} bytes, Last Modified: {{{lastModified}}}
+  - Name: {{{name}}}, Path: {{{path}}}, Size: {{{size}}} bytes, Last Modified: {{{lastModified}}}, Last Accessed: {{{lastAccessed}}}{{#if version}}, Version: {{{version}}}{{/if}}
   {{/each}}
 
   Recommendation:`,

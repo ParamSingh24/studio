@@ -28,6 +28,8 @@ const NaturalLanguageSearchOutputSchema = z.object({
   sizeGreaterThan: z.number().optional().describe('Filter for files larger than this size in bytes.'),
   sizeLessThan: z.number().optional().describe('Filter for files smaller than this size in bytes.'),
   fileNameContains: z.string().optional().describe('Filter for files whose names contain this substring.'),
+  newerThan: z.string().optional().describe('Filter for files modified after this date (YYYY-MM-DD).'),
+  olderThan: z.string().optional().describe('Filter for files modified before this date (YYYY-MM-DD).'),
 });
 export type NaturalLanguageSearchOutput = z.infer<
   typeof NaturalLanguageSearchOutputSchema
@@ -43,21 +45,21 @@ const prompt = ai.definePrompt({
   name: 'naturalLanguageSearchPrompt',
   input: {schema: NaturalLanguageSearchInputSchema},
   output: {schema: NaturalLanguageSearchOutputSchema},
-  prompt: `You are an expert in parsing natural language search queries into structured data.
+  prompt: `You are an expert at parsing natural language search queries into structured data for filtering duplicate files.
 
-You will receive a query from the user. Your task is to parse it and extract filtering criteria.
+  Analyze the user's query and extract filtering criteria. The available categories are: ${allCategories.join(', ')}.
 
-Possible file categories are: ${allCategories.join(', ')}.
+  If the query mentions a file size, convert it to bytes (e.g., 1GB = 1073741824, 500MB = 524288000, 10KB = 10240).
+  If the query mentions a date, convert it to YYYY-MM-DD format. Assume the current year if not specified.
 
-If the query mentions a size, convert it to bytes (e.g., 1GB = 1073741824 bytes, 500MB = 524288000 bytes).
+  Query: {{{query}}}
 
-Query: {{{query}}}
-
-Return a JSON object with the extracted filters. For example:
-- "Show me all games taking up more than 1GB" -> { "categories": ["Games"], "sizeGreaterThan": 1073741824 }
-- "Find Adobe software duplicates" -> { "fileNameContains": "Adobe" }
-- "What can I safely remove to save 5GB?" -> { "sizeGreaterThan": 5368709120 }
-- "media files under 100MB" -> { "categories": ["Media"], "sizeLessThan": 104857600 }
+  Return a JSON object with the extracted filters. Here are some examples:
+  - "Show me all games taking up more than 1GB" -> { "categories": ["Games"], "sizeGreaterThan": 1073741824 }
+  - "Find Adobe software duplicates" -> { "fileNameContains": "Adobe" }
+  - "What can I safely remove to save 5GB?" -> { "sizeGreaterThan": 5368709120 }
+  - "media files under 100MB from before last year" -> { "categories": ["Media"], "sizeLessThan": 104857600, "olderThan": "2023-01-01" }
+  - "anything created since march" -> { "newerThan": "2024-03-01" }
 `,
 });
 
