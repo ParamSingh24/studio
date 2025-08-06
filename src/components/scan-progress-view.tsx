@@ -1,30 +1,12 @@
-'use client';
 
-import { useState, useEffect } from 'react';
+'use client';
 
 interface ScanProgressViewProps {
   progress: number;
+  status: string;
 }
 
-const statusMessages = [
-    "Initializing scan...",
-    "Hashing file contents...",
-    "Analyzing file metadata...",
-    "Searching for duplicates...",
-    "Applying smart categorization...",
-    "Finalizing results..."
-];
-
-export default function ScanProgressView({ progress }: ScanProgressViewProps) {
-    const [statusIndex, setStatusIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setStatusIndex(prevIndex => (prevIndex + 1) % statusMessages.length);
-        }, 2000); // Change status every 2 seconds
-        return () => clearInterval(interval);
-    }, []);
-
+export default function ScanProgressView({ progress, status }: ScanProgressViewProps) {
     const circumference = 2 * Math.PI * 54; // 2 * pi * radius
     const offset = circumference - (progress / 100) * circumference;
 
@@ -53,7 +35,7 @@ export default function ScanProgressView({ progress }: ScanProgressViewProps) {
             style={{
               strokeDasharray: circumference,
               strokeDashoffset: offset,
-              transition: 'stroke-dashoffset 0.35s',
+              transition: 'stroke-dashoffset 0.35s ease-in-out',
               transform: 'rotate(-90deg)',
               transformOrigin: '50% 50%'
             }}
@@ -63,7 +45,7 @@ export default function ScanProgressView({ progress }: ScanProgressViewProps) {
           {Math.round(progress)}%
         </div>
       </div>
-      <h2 className="text-2xl font-semibold mt-8 animate-pulse">{statusMessages[statusIndex]}</h2>
+      <h2 className="text-2xl font-semibold mt-8 animate-pulse">{status}</h2>
       <p className="text-muted-foreground mt-2">Please wait while we sweep your files clean.</p>
     </div>
   );
