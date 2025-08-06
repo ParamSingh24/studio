@@ -9,6 +9,7 @@ import type { AppFile, DuplicateGroup } from '@/lib/types';
 import { categorizeFiles } from '@/ai/flows/categorize-files';
 import { hashFiles } from '@/ai/flows/hash-files';
 import { useToast } from '@/hooks/use-toast';
+import JSZip from 'jszip';
 
 type AppState = 'idle' | 'scanning' | 'results';
 
@@ -37,8 +38,8 @@ export default function DuplicatesDashboard() {
   const [scanStatus, setScanStatus] = useState('Initializing scan...');
   const { toast } = useToast();
 
-  const handleScanStart = useCallback(async (files: File[]) => {
-    if (files.length === 0) {
+  const handleScanStart = useCallback(async (acceptedFiles: File[]) => {
+    if (acceptedFiles.length === 0) {
         toast({
             title: "No files selected",
             description: "Please select files to scan.",
@@ -52,10 +53,47 @@ export default function DuplicatesDashboard() {
     setScanStatus('Preparing files...');
 
     try {
-        // 1. Prepare file metadata and content
+        const processedFiles: File[] = [];
+
+        // 1. Unzip any ZIP files
+        setScanStatus('Checking for ZIP files...');
+        for (const file of acceptedFiles) {
+            if (file.type === 'application/zip' || file.name.endsWith('.zip')) {
+                try {
+                    const zip = await JSZip.loadAsync(file);
+                    for (const relativePath in zip.files) {
+                        const zipEntry = zip.files[relativePath];
+                        if (!zipEntry.dir) {
+                            const blob = await zipEntry.async('blob');
+                            const extractedFile = new File([blob], zipEntry.name, { type: blob.type });
+                            // Monkey-patch the webkitRelativePath to show it's from a zip
+                            Object.defineProperty(extractedFile, 'webkitRelativePath', {
+                              value: `${file.name}/${zipEntry.name}`,
+                              writable: true,
+                            });
+                            processedFiles.push(extractedFile);
+                        }
+                    }
+                     toast({
+                        title: "ZIP file extracted",
+                        description: `Found and extracted ${Object.keys(zip.files).length} items from ${file.name}.`
+                    });
+                } catch (e) {
+                    toast({
+                        title: "Could not read ZIP file",
+                        description: `Skipping corrupted or unreadable ZIP file: ${file.name}`,
+                        variant: "destructive"
+                    });
+                }
+            } else {
+                processedFiles.push(file);
+            }
+        }
+        
+        // 2. Prepare file metadata and content
         setScanProgress(10);
         setScanStatus('Reading files...');
-        const filesToHash = await Promise.all(files.map(async file => ({
+        const filesToHash = await Promise.all(processedFiles.map(async file => ({
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
@@ -63,12 +101,12 @@ export default function DuplicatesDashboard() {
           content: await readFileAsBase64(file),
         })));
 
-        // 2. Hash files on the "backend"
+        // 3. Hash files on the "backend"
         setScanProgress(30);
         setScanStatus('Hashing files to find duplicates...');
         const hashedFileGroups = await hashFiles(filesToHash);
         
-        // 3. Filter for actual duplicates and prepare for categorization
+        // 4. Filter for actual duplicates and prepare for categorization
         const duplicateFilesForCategorization: { fileName: string, fileType: string, fileSize: number, filePath: string }[] = [];
         const allDuplicateFiles: AppFile[] = [];
 
@@ -94,18 +132,18 @@ export default function DuplicatesDashboard() {
             return;
         }
 
-        // 4. Categorize the duplicate files with AI
+        // 5. Categorize the duplicate files with AI
         setScanProgress(60);
         setScanStatus('Categorizing duplicates with AI...');
         const categorizedFiles = await categorizeFiles(duplicateFilesForCategorization);
         const fileCategoryMap = new Map(categorizedFiles.map(f => [f.fileName, f.category]));
 
-        // 5. Update categories in the final file objects
+        // 6. Update categories in the final file objects
         allDuplicateFiles.forEach(file => {
             file.category = fileCategoryMap.get(file.name) || 'Other';
         });
 
-        // 6. Finalize groups for display
+        // 7. Finalize groups for display
         setScanProgress(90);
         setScanStatus('Finalizing results...');
         const finalGroupsMap: Record<string, AppFile[]> = {};
@@ -121,7 +159,8 @@ export default function DuplicatesDashboard() {
                 hash: files[0].hash,
                 files,
                 totalSize: files.reduce((sum, file) => sum + file.size, 0)
-            }));
+            }))
+            .filter(group => group.files.length > 1); // Ensure we only show groups with actual duplicates
 
       setDuplicates(finalGroups);
       
