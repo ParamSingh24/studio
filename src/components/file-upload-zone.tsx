@@ -58,14 +58,31 @@ export default function FileUploadZone({ onScanStart }: FileUploadZoneProps) {
         Drag and drop your files or folders here. CleanSweep AI will intelligently scan for duplicates and categorize them for you.
       </p>
       
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         <label htmlFor="file-upload" className="relative cursor-pointer">
             <Button asChild>
-                <span>Or Select Files</span>
+                <span>Select Files</span>
             </Button>
             <input 
               id="file-upload" 
               name="file-upload" 
+              type="file" 
+              className="sr-only" 
+              multiple 
+              onChange={handleFileSelectFromButton} 
+              disabled={isUploading}
+            />
+        </label>
+
+        <span className="text-muted-foreground">or</span>
+
+        <label htmlFor="folder-upload" className="relative cursor-pointer">
+             <Button asChild variant="outline">
+                <span>Select Folder</span>
+            </Button>
+            <input 
+              id="folder-upload" 
+              name="folder-upload" 
               type="file" 
               className="sr-only" 
               multiple 
