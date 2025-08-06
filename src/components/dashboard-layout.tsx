@@ -2,7 +2,7 @@
 "use client"
 
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from "@/components/ui/sidebar"
-import { HardDrive, Home, Copy, Settings, PieChart } from "lucide-react"
+import { HardDrive, Home, Copy, Settings, BarChart, Upload, Tags, Trash2, Database } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -14,8 +14,14 @@ export default function DashboardLayout({
   const pathname = usePathname()
 
   const menuItems = [
-    { href: "/", label: "Home", icon: Home },
+    { href: "/", label: "Dashboard", icon: Home },
+    { href: "/upload", label: "Upload & Scan", icon: Upload },
     { href: "/duplicates", label: "Duplicates", icon: Copy },
+    { href: "/categories", label: "Categories", icon: Tags },
+    { href: "/analytics", label: "Analytics", icon: BarChart },
+    { href: "/cleanup", label: "Cleanup", icon: Trash2 },
+    { href: "/storage", label: "Storage", icon: Database },
+    { href: "/settings", label: "Settings", icon: Settings },
   ]
 
   return (
@@ -25,13 +31,13 @@ export default function DashboardLayout({
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <HardDrive className="size-6 text-primary" />
-              <span className="text-lg font-semibold">CleanSweep AI</span>
+              <span className="text-lg font-semibold">CleanSpace AI</span>
             </div>
           </SidebarHeader>
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} legacyBehavior passHref>
+                <Link href={item.href}>
                   <SidebarMenuButton isActive={pathname === item.href}>
                     <item.icon className="size-4" />
                     <span>{item.label}</span>
