@@ -26,20 +26,18 @@ export default function DuplicateGroupCard({ group, onGroupDeleted }: DuplicateG
   const handleGetRecommendation = async () => {
     setIsLoading(true);
     setRecommendation(null);
+    setRecommendedToKeep(null);
     try {
       if (group.files.length < 2) {
           setRecommendation("Not enough files to compare.");
           return;
       }
-      const res = await getCleanupRecommendation(group.files[0], group.files[1]);
+      const res = await getCleanupRecommendation(group.files.filter(f => !deletedFiles.includes(f.id)));
       setRecommendation(res.recommendation);
 
-      const keepMatch = res.recommendation.match(/keep `([^`]+)`/);
-      if(keepMatch && keepMatch[1]) {
-        const fileToKeep = group.files.find(f => f.name === keepMatch[1]);
-        if(fileToKeep) {
-            setRecommendedToKeep(fileToKeep.id);
-        }
+      const fileToKeep = group.files.find(f => f.name === res.fileToKeep.name && f.path === res.fileToKeep.path);
+      if(fileToKeep) {
+        setRecommendedToKeep(fileToKeep.id);
       }
 
     } catch (error) {

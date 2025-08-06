@@ -25,8 +25,9 @@ export type CategorizeFilesInput = z.infer<typeof CategorizeFilesInputSchema>;
 const CategorizeFilesOutputSchema = z.array(
   z.object({
     fileName: z.string().describe('The name of the file.'),
-    category: z.string().describe('The predicted category of the file (e.g., Games, Productivity, Development, Browsers, Media, Graphics, Security, System Tools).'),
-    confidence: z.number().describe('The confidence score (0-1) of the categorization.'),
+    category: z.enum(["Games", "Productivity", "Development", "Browsers", "Media", "Graphics", "Security", "System Tools", "Other"]).describe('The predicted category of the file.'),
+    confidence: z.number().min(0).max(1).describe('The confidence score (0-1) of the categorization.'),
+    reasoning: z.string().describe('A brief explanation for the categorization.')
   })
 ).describe('An array of file categorization results.');
 
@@ -43,13 +44,13 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert file categorization AI.
 
   Given a list of files with their metadata (name, type, size, hash), you will predict the most appropriate category for each file from the following list:
-  Games, Productivity, Development, Browsers, Media, Graphics, Security, System Tools
+  Games, Productivity, Development, Browsers, Media, Graphics, Security, System Tools, Other.
 
-  Return a JSON array of file categorization results, including the file name, predicted category, and a confidence score (0-1) for the categorization.
+  Return a JSON array of file categorization results, including the file name, predicted category, a confidence score (0-1), and a brief reasoning for the categorization.
 
   Here is the list of files to categorize:
   {{#each this}}
-  - Filename: {{{fileName}}}, File Type: {{{fileType}}}, File Size: {{{fileSize}}} bytes, File Hash: {{{fileHash}}}
+  - Filename: {{{fileName}}}, File Type: {{{fileType}}}, File Size: {{{fileSize}}} bytes
   {{/each}}
   `,
 });

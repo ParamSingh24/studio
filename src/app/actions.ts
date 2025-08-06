@@ -3,25 +3,40 @@
 import { recommendCleanup } from '@/ai/flows/recommend-cleanup';
 import type { AppFile } from '@/lib/types';
 
-export async function getCleanupRecommendation(file1: AppFile, file2: AppFile) {
+export async function getCleanupRecommendation(files: AppFile[]) {
+  if (files.length < 2) {
+    throw new Error("Need at least two files to compare.");
+  }
   // In a real app, you would get more detailed file descriptions.
-  const file1Description = `Name: ${file1.name}, Path: ${file1.path}, Modified: ${file1.lastModified.toISOString()}`;
-  const file2Description = `Name: ${file2.name}, Path: ${file2.path}, Modified: ${file2.lastModified.toISOString()}`;
+  const fileInfos = files.map(file => ({
+    name: file.name,
+    path: file.path,
+    size: file.size,
+    lastModified: file.lastModified.toISOString(),
+  }));
+
 
   // Simple mock logic for demonstration without hitting real API in UI-only mode
-  if (process.env.NODE_ENV !== 'production') {
-      const recommendation = file1.lastModified > file2.lastModified 
-          ? `I recommend you keep \`${file1.name}\` because it was modified more recently.`
-          : `I recommend you keep \`${file2.name}\` because it was modified more recently.`;
+  if (process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_USE_MOCKS === 'true') {
+      const sortedFiles = [...files].sort((a,b) => b.lastModified.getTime() - a.lastModified.getTime());
+      const fileToKeep = sortedFiles[0];
+
+      const recommendation = `I recommend you keep \`${fileToKeep.name}\` because it was modified more recently.`;
       
       await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
       
       return {
           recommendation,
-          confidenceScore: 0.85
+          confidenceScore: 0.85,
+          fileToKeep: {
+            name: fileToKeep.name,
+            path: fileToKeep.path,
+            size: fileToKeep.size,
+            lastModified: fileToKeep.lastModified.toISOString(),
+          }
       };
   }
   
-  const result = await recommendCleanup({ file1Description, file2Description });
+  const result = await recommendCleanup({ files: fileInfos });
   return result;
 }
