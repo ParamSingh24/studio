@@ -11,8 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 
 type AppState = 'idle' | 'scanning' | 'results';
 
-// Helper function to create mock file hashes
-const getFileHash = (file: File) => {
+// Helper function to create file hashes
+const getFileHash = async (file: File): Promise<string> => {
   // In a real app, this would be a proper hash like SHA-256
   // For this demo, we'll use a combination of name and size to simulate content hashing
   return `mock-hash-${file.name}-${file.size}`;
@@ -62,8 +62,10 @@ export default function DuplicatesDashboard() {
       
       // 3. Process and group duplicates
       const duplicateGroups: Record<string, AppFile[]> = {};
-      files.forEach((file, index) => {
-          const hash = getFileHash(file);
+      
+      for (let index = 0; index < files.length; index++) {
+          const file = files[index];
+          const hash = await getFileHash(file);
           const category = fileMapWithCategory.get(file.name) || 'Other';
           const appFile: AppFile = {
               id: `file-${Date.now()}-${index}`,
@@ -80,7 +82,7 @@ export default function DuplicatesDashboard() {
               duplicateGroups[hash] = [];
           }
           duplicateGroups[hash].push(appFile);
-      });
+      }
       
       await new Promise(res => setTimeout(res, 1000));
       setScanProgress(90);
