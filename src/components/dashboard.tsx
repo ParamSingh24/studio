@@ -6,7 +6,6 @@ import { Copy, HardDrive, AlertTriangle, CheckCircle, TrendingUp, FolderGit2, Pe
 import Link from 'next/link';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import DuplicatesDashboard from './duplicates-dashboard';
 
 const storageSavingsData = [
   { month: 'Jan', saved: 2.1 },
@@ -158,11 +157,16 @@ export default function Dashboard() {
             <CardHeader>
                 <CardTitle>Ready to Clean Up?</CardTitle>
                 <CardDescription>
-                    Start a new scan to find and remove duplicate files, reclaiming valuable disk space.
+                    Navigate to the Duplicates page to find and remove duplicate files, reclaiming valuable disk space.
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <DuplicatesDashboard />
+                 <Link href="/duplicates" passHref>
+                    <Button>
+                        <Copy className="mr-2" />
+                        Go to Duplicates Finder
+                    </Button>
+                </Link>
             </CardContent>
         </Card>
     </div>
