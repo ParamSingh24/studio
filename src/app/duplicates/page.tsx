@@ -7,7 +7,7 @@ export default function DuplicatesPage() {
     <div className="space-y-6 py-6">
        <h1 className="text-3xl font-bold">Duplicates</h1>
       <p className="text-muted-foreground">
-        The core duplicate scanning functionality is currently on the main dashboard.
+        The core duplicate scanning functionality is now on the "Upload & Scan" page.
       </p>
     </div>
   );

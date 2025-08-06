@@ -157,13 +157,17 @@ export default function Dashboard() {
 
         <Card>
             <CardHeader>
-                <CardTitle>Duplicates Finder</CardTitle>
+                <CardTitle>Ready to Clean?</CardTitle>
                 <CardDescription>
-                    Start a new scan to find and remove duplicate files, reclaiming valuable disk space.
+                    Head over to the Upload & Scan page to find and remove duplicate files, reclaiming valuable disk space.
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <DuplicatesDashboard />
+                <Link href="/upload">
+                    <Button>
+                        Start Scanning
+                    </Button>
+                </Link>
             </CardContent>
         </Card>
     </div>
