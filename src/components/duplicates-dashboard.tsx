@@ -1,12 +1,11 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import FileUploadZone from './file-upload-zone';
 import ScanProgressView from './scan-progress-view';
 import ResultsView from './results-view';
 import type { AppFile, DuplicateGroup } from '@/lib/types';
-import { mockDuplicateGroups } from '@/lib/mock-data';
 import { categorizeFiles } from '@/ai/flows/categorize-files';
 import { useToast } from '@/hooks/use-toast';
 
@@ -15,7 +14,8 @@ type AppState = 'idle' | 'scanning' | 'results';
 // Helper function to create mock file hashes
 const getFileHash = (file: File) => {
   // In a real app, this would be a proper hash like SHA-256
-  return `mock-hash-${file.name}-${file.size}-${file.lastModified}`;
+  // For this demo, we'll use a combination of name and size to simulate content hashing
+  return `mock-hash-${file.name}-${file.size}`;
 };
 
 export default function DuplicatesDashboard() {
@@ -60,7 +60,7 @@ export default function DuplicatesDashboard() {
       
       const fileMapWithCategory = new Map(categorizedFiles.map(f => [f.fileName, f.category]));
       
-      // 3. Process and group duplicates (mock logic)
+      // 3. Process and group duplicates
       const duplicateGroups: Record<string, AppFile[]> = {};
       files.forEach((file, index) => {
           const hash = getFileHash(file);
