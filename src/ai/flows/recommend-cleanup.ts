@@ -16,7 +16,6 @@ const FileInfoSchema = z.object({
   path: z.string().describe('The installation path of the file.'),
   size: z.number().describe('The size of the file in bytes.'),
   lastModified: z.string().describe('The last modification date in ISO 8601 format.'),
-  lastAccessed: z.string().describe('The last access date in ISO 8601 format.'),
   version: z.string().optional().describe('The file version, if available.'),
 });
 
@@ -45,14 +44,14 @@ const prompt = ai.definePrompt({
   Analyze the provided file metadata. Your recommendation should be based on a hierarchy of factors:
   1.  **Version:** A higher version number is almost always better.
   2.  **Path:** "Official" locations (e.g., 'Program Files', '/usr/bin') are preferable to temporary or download folders.
-  3.  **Recency:** A more recent 'lastModified' or 'lastAccessed' date is generally better.
+  3.  **Recency:** A more recent 'lastModified' date is generally better.
   4.  **Size:** A larger file might indicate a more complete version, but this is a weak indicator.
 
   Provide a concise recommendation explaining your reasoning, a confidence score based on the strength of the signals, and explicitly state which file should be kept.
 
   Files to analyze:
   {{#each files}}
-  - Name: {{{name}}}, Path: {{{path}}}, Size: {{{size}}} bytes, Last Modified: {{{lastModified}}}, Last Accessed: {{{lastAccessed}}}{{#if version}}, Version: {{{version}}}{{/if}}
+  - Name: {{{name}}}, Path: {{{path}}}, Size: {{{size}}} bytes, Last Modified: {{{lastModified}}}{{#if version}}, Version: {{{version}}}{{/if}}
   {{/each}}
 
   Recommendation:`,

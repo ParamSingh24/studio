@@ -15,7 +15,6 @@ export async function getCleanupRecommendation(files: AppFile[]) {
     path: file.path,
     size: file.size,
     lastModified: file.lastModified.toISOString(),
-    lastAccessed: file.lastModified.toISOString(), // Using lastModified as a proxy
   }));
 
   const result = await recommendCleanup({ files: fileInfos });
