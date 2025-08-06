@@ -31,7 +31,7 @@ export default function DashboardLayout({
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href}>
+                <Link href={item.href} legacyBehavior passHref>
                   <SidebarMenuButton isActive={pathname === item.href}>
                     <item.icon className="size-4" />
                     <span>{item.label}</span>
